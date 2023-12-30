@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+
+{% block header %}
+<h1>{% block title %}Job Details{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="card w-75 mx-auto">
+  <div class="card-body">
+    <h4 class="card-title">{{ job.title }}</h4>
+    <h5 class="card-subtitle mb-2 text-muted">{{ job.company }}</h5>
+    <p class="card-text">{{ job.description }}</p>
+    <a href="{{ job.url }}" class="text-decoration-none" target="_blank">
+      <button class="btn btn-primary mx-2">Apply</button>
+    </a>
+
+    <button
+      class="card-link like-button btn {{ 'btn-danger' if job.is_favorite else 'btn-outline-danger' }}"
+      id="like-button"
+      data-job-id="{{ job.id }}"
+      data-is-favorite="{{ "true" if job.is_favorite }}"
+    >
+      {{ "♥" if job.is_favorite else "♡" }}
+    </button>
+    {% if job.is_owned_by_user %}
+    <button class="card-link btn btn-danger" id="delete-button">Delete</button>
+    {% endif %}
+
+    <div
+      class="modal fade"
+      id="delete-job-modal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="delete-job-modal-label"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body text-center">
+            <h5 class="modal-title" id="delete-job-modal-label">
+              Are you sure you want to delete this job?
+            </h5>
+            <button
+              type="button"
+              class="btn btn-danger"
+              id="delete-confirm-button"
+            >
+              Yes
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              No
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+
+    // Like button
+    const likeButton = document.querySelector("#like-button");
+    likeButton.addEventListener("click", function(event) {
+      const isFavorite = event.target.dataset.isFavorite === "true";
+      const jobId = event.target.dataset.jobId;
+
+      fetch(`/favorites/${jobId}`, { method: isFavorite ? "DELETE" : "POST" })
+        .then(function(response) {
+          if (response.ok) {
+            event.target.dataset.isFavorite = isFavorite ? "false" : "true";
+            event.target.classList.toggle("btn-outline-danger");
+            event.target.classList.toggle("btn-danger");
+            event.target.textContent = isFavorite ? "♡" : "♥";
+          }
+        })
+      })
+
+      // Delete button and delete confirmation modal
+      const deleteButton = document.querySelector("#delete-button");
+      const deleteModalElement = document.querySelector("#delete-job-modal");
+      const deleteModal = new bootstrap.Modal(deleteModalElement);
+      const deleteConfirmButton = document.querySelector("#delete-confirm-button");
+
+      deleteButton.addEventListener("click", function() {
+        console.log("clicked");
+        deleteModal.show();
+      })
+
+
+
+      deleteConfirmButton.addEventListener("click", function() {
+        const likeButton = document.querySelector("#like-button");
+        const jobId = likeButton.dataset.jobId;
+        deleteModal.hide();
+        fetch(`/jobs/${jobId}`, { method: "DELETE" })
+          .then(function(response) {
+            if (response.ok) {
+              window.location.href = "/";
+            }
+          })
+      })
+
+
+    })
+</script>
+{% endblock %}

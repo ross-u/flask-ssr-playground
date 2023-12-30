@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block header %}
+<h1>{% block title %}Latest Jobs{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <div class="container text-center">
+    <div class="row">
+      {% for job in jobs %}
+          <div class="card col-11 col-md-8 col-lg-8 col-xl-8 col-xxl-8 mx-auto mb-3">
+            <div class="card-body">
+              <h2 class="card-title">{{ job.title }}</h2>
+              <p class="card-text">{{ job.description }}</p>
+              <a href="/jobs/{{ job.id }}" class="btn btn-primary">View</a>
+              {% if job.is_favorite %}
+                <button class="like-button btn btn-danger" data-is-favorite="true" data-job-id="{{ job.id }}">♥</button>
+              {% else %}
+                <button class="like-button btn btn-outline-danger" data-is-favorite="false" data-job-id="{{ job.id }}">♡</button>
+              {% endif %}
+            </div>
+          </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      document.querySelectorAll(".like-button").forEach(function(button) {
+        button.addEventListener("click", function(event) {
+          const isFavorite = event.target.dataset.isFavorite === "true";
+          const jobId = event.target.dataset.jobId;
+          
+          fetch(
+            `/favorites/${jobId}`,
+          {
+            method: isFavorite ? "DELETE" : "POST"
+          }
+          ).then(function(response) {
+            if (response.ok) {
+              event.target.dataset.isFavorite = isFavorite ? "false" : "true";
+              event.target.classList.toggle("btn-outline-danger");
+              event.target.classList.toggle("btn-danger");
+              event.target.textContent = isFavorite ? "♡" : "♥";
+            }
+          })
+        })
+      })
+
+    })
+  </script>
+{% endblock %}

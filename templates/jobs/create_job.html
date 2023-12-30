@@ -1,0 +1,104 @@
+<!--
+  -- Table structure for better Copilot autocompletions
+CREATE TABLE IF NOT EXISTS jobs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  company TEXT NOT NULL,
+  image TEXT NOT NULL default 'https://placehold.co/600x400.png',
+  tags TEXT NOT NULL,
+  url TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now','localtime')),
+  updated_at TEXT DEFAULT (datetime('now','localtime')),  
+  creator_id INTEGER NOT NULL,
+  FOREIGN KEY(creator_id) REFERENCES users(id)
+);
+
+-->
+
+{% extends "layout.html"  %}
+
+{% block header %}
+<h1>{% block title %}Post a Job{% endblock %}</h1>
+{% endblock %} 
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <form action="/jobs" method="post" class="needs-validation" novalidate>
+        <div class="form-group mb-2">
+          <label for="title">Job Title</label>
+          <input type="text" class="form-control" id="title" name="title" required autofocus>
+        </div>
+        <div class="form-group mb-2">
+          <label for="description">Job Description</label>
+          <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+        </div>
+        <div class="form-group mb-2">
+          <label for="company">Company</label>
+          <input type="text" class="form-control" id="company" name="company" required>
+        </div>
+        <div class="form-group mb-2">
+          <label for="image">Image URL</label>
+          <input type="text" class="form-control" id="image" name="image" value="https://placehold.co/600x400.png">
+        </div>
+        <div class="form-group mb-2">
+          <label for="tags">Tags</label>
+          <input type="text" class="form-control" id="tag-input" name="tags" required>
+          <div id="tags" class="mt-2"></div>
+        </div>
+        <div class="form-group mb-2">
+          <label for="url">Job URL</label>
+          <input type="text" class="form-control" id="url" name="url" required>
+        </div>
+        <div class="form-group mt-4 d-flex justify-content-center">
+          <button type="submit" class="btn btn-primary w-75">Create</button>
+        </div>  
+      </form>
+      <br />
+      <br />
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+
+    document.getElementById('tag-input').addEventListener('keydown', function(e) {
+      if (e.key === ',') {
+        e.preventDefault();
+        const tag = this.value.trim();
+        if (tag) {
+          const tagElement = document.createElement('span');
+          tagElement.classList.add('tag');
+          tagElement.textContent = tag;
+          document.getElementById('tags').appendChild(tagElement);
+          this.value = '';
+        }
+      }
+    });
+    
+    const inputs = document.querySelectorAll('input');
+    Array.from(inputs).forEach(input => {
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+        }
+      });
+    });
+  });
+
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const tags = document.querySelectorAll('.tag');
+    const tagsArray = Array.from(tags).map(tag => tag.textContent);
+    const tagsInput = document.getElementById('tag-input');
+    tagsInput.value = tagsArray.join(',');
+    form.submit();
+  });
+  </script>
+  {% endblock %}

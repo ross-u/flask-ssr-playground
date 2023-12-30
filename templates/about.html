@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <h1 class="mt-4">About</h1>
+      <p class="lead">
+        What is this project about?
+      </p>
+      <p>
+        The project is built using a tech stack that includes SQLite database, <strong>Python</strong> and <strong>Flask</strong> for the backend. Additional Flask extensions like <strong>Flask-Mail</strong> and <strong>Flask-Session</strong> are used for email handling and session management. I used <strong>Mailtrap</strong>'s email service, mainly for the simplicity of the setup, and it is used for sending account verification emails. To make the prototyping and styling faster, <strong>Bootstrap</strong> is used for the frontend.
+      </p>
+      <a href="/" class="btn btn-primary mt-3">Back to Home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
